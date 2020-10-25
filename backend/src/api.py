@@ -104,7 +104,10 @@ def unprocessable(error):
 '''
 
 
-'''
-@TODO implement error handler for AuthError
-    error handler should conform to general task above 
-'''
+@app.errorhandler(401)
+def authorization_header_missing(error):
+    return jsonify({
+        "success": False,
+        "error": 401,
+        "message": "Authorization issue: " + error.error["description"]
+    }), 401
