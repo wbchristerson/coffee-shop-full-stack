@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, jsonify, abort
+from flask import Flask, request, jsonify, abort, flash
 from sqlalchemy import exc
 import json
 from flask_cors import CORS
@@ -16,7 +16,7 @@ CORS(app)
 !! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
 !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
 '''
-db_drop_and_create_all()
+# db_drop_and_create_all()
 
 ## ROUTES
 '''
@@ -27,6 +27,23 @@ db_drop_and_create_all()
     returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
         or appropriate status code indicating reason for failure
 '''
+@app.route('/drinks')
+def retrieve_drinks():
+    try:
+        all_drinks = Drink.query.all()
+        print("drinks length: ", len(all_drinks))
+        for d in all_drinks:
+            print()
+            print("a drink: ", end="")
+            print(d)
+        return jsonify({
+            "success": True,
+            "drinks": [drink.short() for drink in all_drinks]
+        })
+    except Exception as e:
+        flash(f"An error occurred: {str(e)}")
+        abort(404)
+        
 
 
 '''
@@ -48,7 +65,17 @@ db_drop_and_create_all()
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the newly created drink
         or appropriate status code indicating reason for failure
 '''
-
+@app.route('/drinks', methods=["POST"])
+@requires_auth('post:drinks')
+def create_new_drink():
+    body = request.get_json()
+    # recipe, title
+    drink = Drink(body.get("recipe"), body.get("title"))
+    drink.insert()
+    return jsonify({
+        "success": True,
+        "drinks": [drink.long()]
+    })
 
 '''
 @TODO implement endpoint
