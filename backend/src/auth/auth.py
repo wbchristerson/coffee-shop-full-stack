@@ -1,5 +1,5 @@
 import json
-from flask import request, _request_ctx_stack
+from flask import request, _request_ctx_stack, abort
 from functools import wraps
 from jose import jwt
 from urllib.request import urlopen
@@ -7,7 +7,7 @@ from urllib.request import urlopen
 
 AUTH0_DOMAIN = 'dev-9xo5gdfc.us.auth0.com'
 ALGORITHMS = ['RS256']
-API_AUDIENCE = 'coffee'
+API_AUDIENCE = 'coffee1'
 
 ## AuthError Exception
 '''
@@ -30,7 +30,7 @@ def get_token_auth_header() -> str:
     auth = request.headers.get('Authorization', None)
     if not auth:
         raise AuthError({
-            'code': 'authorization-header_missing',
+            'code': 'authorization_header_missing',
             'description': 'Authorization header is expected.'
         }, 401)
     
@@ -57,7 +57,6 @@ def get_token_auth_header() -> str:
 def check_permissions(permission, payload):
     """Note: this broadly copies the app.py check_permissions function created for the
     demonstrative app created in the course by Gabe Ruttner"""
-    
     if "permissions" not in payload:
         raise AuthError({
             "code": "invalid_claims",
@@ -101,7 +100,7 @@ def verify_decode_jwt(token):
         }, 401)
     
     rsa_key = dict()
-    for key in jwks["key"]:
+    for key in jwks["keys"]:
         if "kid" in key and key["kid"] == unverified_header["kid"]:
             rsa_key = {
                 "kty": key["kty"],
@@ -113,15 +112,20 @@ def verify_decode_jwt(token):
 
     if rsa_key:
         try:
-            payload = jwt.decode(token, rsa_key, algorithms=ALGORITHMS,
-                audience=API_AUDIENCE, issuer="https://" + AUTH0_DOMAIN + "/")
+            payload = jwt.decode(
+                token,
+                rsa_key,
+                algorithms=ALGORITHMS,
+                audience=API_AUDIENCE,
+                issuer="https://" + AUTH0_DOMAIN + "/"
+            )
             return payload
         except jwt.ExpiredSignatureError:
             raise AuthError({
                 "code": "token_expired",
                 "description": "Token expired."
             }, 401)
-        except jwt.JWTClaimsError:
+        except jwt.JWTClaimsError as ex:
             raise AuthError({
                 "code": "invalid_claims",
                 "description": "Invalid claims provided; check audience and issuer."
@@ -151,10 +155,14 @@ def requires_auth(permission=''):
     def requires_auth_decorator(f):
         @wraps(f)
         def wrapper(*args, **kwargs):
-            token = get_token_auth_header()
-            payload = verify_decode_jwt(token)
-            check_permissions(permission, payload)
-            return f(payload, *args, **kwargs)
 
+            try:
+                token = get_token_auth_header()
+                payload = verify_decode_jwt(token)
+                check_permissions(permission, payload)
+                return f(payload, *args, **kwargs)
+            except AuthError:
+                # raise ae
+                abort(401)
         return wrapper
     return requires_auth_decorator
