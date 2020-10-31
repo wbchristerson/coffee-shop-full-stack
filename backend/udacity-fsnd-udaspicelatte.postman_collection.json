@@ -496,7 +496,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"title\": \"Water3\",\n    \"recipe\": {\n        \"name\": \"Water\",\n        \"color\": \"blue\",\n        \"parts\": 1\n    }\n}",
+							"raw": "{\n    \"title\": \"Water3\",\n    \"recipe\": [\n        {\n            \"name\": \"Water\",\n            \"color\": \"blue\",\n            \"parts\": 1\n        },\n        {\n            \"name\": \"Juice\",\n            \"color\": \"orange\",\n            \"parts\": 1\n        }\n    ]\n}",
 							"options": {
 								"raw": {}
 							}
