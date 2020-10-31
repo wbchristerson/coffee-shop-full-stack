@@ -2,13 +2,13 @@
 
 ## Getting Setup
 
-> _tip_: this frontend is designed to work with [Flask-based Backend](../backend). It is recommended you stand up the backend first, test using Postman, and then the frontend should integrate smoothly.
+> _tip_: this frontend is designed to work with [Flask-based Backend](../backend). Please make sure the back-end server is running first (I use `http://localhost:5000` locally for the server; it is not currently hosted anywhere remotely).
 
 ### Installing Dependencies
 
 #### Installing Node and NPM
 
-This project depends on Nodejs and Node Package Manager (NPM). Before continuing, you must download and install Node (the download includes NPM) from [https://nodejs.com/en/download](https://nodejs.org/en/download/).
+This project depends on Nodejs and Node Package Manager (NPM). Please download and install Node (the download includes NPM) from [https://nodejs.com/en/download](https://nodejs.org/en/download/).
 
 #### Installing Ionic Cli
 
@@ -24,15 +24,14 @@ npm install
 
 >_tip_: **npm i** is shorthand for **npm install**
 
-## Required Tasks
 
-### Configure Enviornment Variables
+## Configure Enviornment Variables
 
 Ionic uses a configuration file to manage environment variables. These variables ship with the transpiled software and should not include secrets.
 
-- Open `./src/environments/environments.ts` and ensure each variable reflects the system you stood up for the backend.
+- Ensure that each variable in `./src/environments/environments.ts` reflects the system you stood up for the backend.
 
-## Running Your Frontend in Dev Mode
+## Running The Frontend in Dev Mode
 
 Ionic ships with a useful development server which detects changes and transpiles as you work. The application is then accessible through the browser on a localhost port. To run the development server, cd into the `frontend` directory and run:
 
@@ -43,13 +42,11 @@ ionic serve
 >_tip_: Do not use **ionic serve**  in production. Instead, build Ionic into a build artifact for your desired platforms.
 [Checkout the Ionic docs to learn more](https://ionicframework.com/docs/cli/commands/build)
 
-## Key Software Design Relevant to Our Coursework
-
-The frontend framework is a bit beefy; here are the two areas to focus your study.
+## Key Software Design
 
 ### Authentication
 
-The authentication system used for this project is Auth0. `./src/services/auth.service.ts` contains the logic to direct a user to the Auth0 login page, managing the JWT token upon successful callback, and handle setting and retrieving the token from the local store. This token is then consumed by our DrinkService (`./src/services/auth.service.ts`) and passed as an Authorization header when making requests to our backend.
+The authentication system used for this project is Auth0. `./src/services/auth.service.ts` contains the logic to direct a user to the Auth0 login page, managing the JWT token upon successful callback, and to handle setting and retrieving the token from the local store. This token is then consumed by DrinkService (`./src/services/auth.service.ts`) and passed as an Authorization header when making requests to the backend.
 
 ### Authorization
 
